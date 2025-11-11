@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+
+# Flask
+instance/
+.env
+*.db
+
+# React
+react-app/node_modules/
+react-app/build/
+
+# System files
+.DS_Store
+Thumbs.db
