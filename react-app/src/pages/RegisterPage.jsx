@@ -6,9 +6,13 @@ function RegisterPage() {
   const [password, setPassword] = useState("");
   const [msg, setMsg] = useState("");
 
+  const baseUrl = process.env.REACT_APP_API_URL || 'http://127.0.0.1:5000';
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const res = await fetch("http://127.0.0.1:5000/register", {
+    const res = await fetch(`${baseUrl}/register` 
+    // const res = await fetch("http://127.0.0.1:5000/register"
+    , {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: new URLSearchParams({ username, password }),
