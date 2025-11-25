@@ -148,8 +148,12 @@ def login():
     name = request.form.get("username")
     pwd = request.form.get("password")
     
-    code = "select * from login_user where username='%s'" % name
-    cursor_select = con_my_sql(code)  # 现在直接返回结果列表
+    # code = "select * from login_user where username='%s'" % name
+    # cursor_select = con_my_sql(code)  # 现在直接返回结果列表
+    cursor_select = con_my_sql(
+    "SELECT * FROM login_user WHERE username = %s",
+    (name,)
+    )
     
     if len(cursor_select) > 0:
         if pwd == cursor_select[0]['password']:
@@ -164,8 +168,12 @@ def register():
     name = request.form.get("username")
     pwd = request.form.get("password")
     
-    code = "select * from login_user where username='%s'" % name
-    cursor_select = con_my_sql(code)
+    # code = "select * from login_user where username='%s'" % name
+    # cursor_select = con_my_sql(code)
+    con_my_sql(
+    "INSERT INTO login_user (username, password) VALUES (%s, %s)",
+    (name, pwd)
+    )
     
     if len(cursor_select) > 0:
         return jsonify({"status": "error", "msg": "用户已存在"})

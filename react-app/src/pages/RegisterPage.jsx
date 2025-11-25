@@ -6,7 +6,8 @@ function RegisterPage() {
   const [password, setPassword] = useState("");
   const [msg, setMsg] = useState("");
 
-  const baseUrl = process.env.REACT_APP_API_URL || 'http://127.0.0.1:5000';
+  const baseUrl = process.env.REACT_APP_API_URL || 'https://app-llm.onrender.com';
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
