@@ -133,55 +133,61 @@
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from test import con_my_sql
+from test import con_my_sql  # 你 test.py 已经是 Postgres 版本，这名字可以继续用
 import os
 
 app = Flask(__name__)
-CORS(app)  # 允许所有跨域(简单但不太安全,生产环境建议限制)
+CORS(app)  # 开发阶段允许全部跨域
 
 @app.route("/")
 def home():
-    return "后端正在运行。。。"
+    return "后端正在运行..."
 
+# ========================= 登录 =========================
 @app.route("/login", methods=["POST"])
 def login():
     name = request.form.get("username")
     pwd = request.form.get("password")
-    
-    # code = "select * from login_user where username='%s'" % name
-    # cursor_select = con_my_sql(code)  # 现在直接返回结果列表
-    cursor_select = con_my_sql(
-    "SELECT * FROM login_user WHERE username = %s",
-    (name,)
+
+    # 用 PostgreSQL 参数化查询
+    rows = con_my_sql(
+        "SELECT * FROM login_user WHERE username = %s",
+        (name,)
     )
-    
-    if len(cursor_select) > 0:
-        if pwd == cursor_select[0]['password']:
-            return jsonify({"status": "success", "msg": "登录成功"})
-        else:
-            return jsonify({"status": "error", "msg": "密码错误"})
-    else:
+
+    if len(rows) == 0:
         return jsonify({"status": "error", "msg": "用户不存在"})
 
+    if pwd == rows[0]["password"]:
+        return jsonify({"status": "success", "msg": "登录成功"})
+    else:
+        return jsonify({"status": "error", "msg": "密码错误"})
+
+
+# ========================= 注册 =========================
 @app.route("/register", methods=["POST"])
 def register():
     name = request.form.get("username")
     pwd = request.form.get("password")
-    
-    # code = "select * from login_user where username='%s'" % name
-    # cursor_select = con_my_sql(code)
-    con_my_sql(
-    "INSERT INTO login_user (username, password) VALUES (%s, %s)",
-    (name, pwd)
+
+    # 检查是否已存在
+    rows = con_my_sql(
+        "SELECT * FROM login_user WHERE username = %s",
+        (name,)
     )
-    
-    if len(cursor_select) > 0:
+
+    if len(rows) > 0:
         return jsonify({"status": "error", "msg": "用户已存在"})
-    else:
-        code = "INSERT INTO login_user (username, password) VALUES ('%s','%s')" % (name, pwd)
-        con_my_sql(code)
-        return jsonify({"status": "success", "msg": "注册成功"})
+
+    # 插入新用户
+    con_my_sql(
+        "INSERT INTO login_user (username, password) VALUES (%s, %s)",
+        (name, pwd)
+    )
+
+    return jsonify({"status": "success", "msg": "注册成功"})
+
 
 if __name__ == "__main__":
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=True)
