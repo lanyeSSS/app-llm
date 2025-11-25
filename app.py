@@ -139,6 +139,10 @@ import os
 app = Flask(__name__)
 CORS(app)  # 允许所有跨域(简单但不太安全,生产环境建议限制)
 
+@app.route("/")
+def home():
+    return "后端正在运行。。。"
+
 @app.route("/login", methods=["POST"])
 def login():
     name = request.form.get("username")
